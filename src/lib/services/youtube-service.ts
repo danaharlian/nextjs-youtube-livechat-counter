@@ -1,12 +1,12 @@
 import { google } from "googleapis";
 
-import { safeString } from "@/lib/utils";
-
 import {
-  YouTubeLiveChatResponse,
-  YouTubeVideo,
-} from "@/features/youtube/types/youtube";
-import * as youtubeUtils from "@/features/youtube/utils";
+  createLiveChatErrorMessage,
+  safeString,
+  sanitizeLiveStreamingDetails,
+} from "@/lib/utils";
+
+import { YouTubeLiveChatResponse, YouTubeVideo } from "@/types/youtube";
 
 const createYoutubeService = () => {
   const youtube = google.youtube({
@@ -39,8 +39,7 @@ export const getVideoDetails = async (
       throw new Error(`Video ${videoId} is not a live stream`);
     }
 
-    const sanitizedDetails =
-      youtubeUtils.sanitizeLiveStreamingDetails(liveStreamingDetails);
+    const sanitizedDetails = sanitizeLiveStreamingDetails(liveStreamingDetails);
 
     return {
       id: video.id as string,
@@ -63,7 +62,7 @@ export const getLiveChatId = async (videoId: string): Promise<string> => {
   const video = await getVideoDetails(videoId);
 
   if (!video.liveStreamingDetails.activeLiveChatId) {
-    const errorMessage = youtubeUtils.createLiveChatErrorMessage(
+    const errorMessage = createLiveChatErrorMessage(
       videoId,
       video.liveStreamingDetails
     );
